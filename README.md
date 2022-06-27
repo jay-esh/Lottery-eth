@@ -27,7 +27,7 @@ or
 npm hardhat compile
 npm hardhat deploy 
 ```
-For running a local node 
+### For running a local node 
 ```
 yarn hardhat node
 ```
