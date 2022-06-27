@@ -21,6 +21,7 @@ contract Lottery is VRFConsumerBaseV2 {
     address public player;
     uint256 public playerNum;
     bool public winnerOrNot;
+    uint256 public gambelledamount;
 
     constructor(
         address vrfCoordinator,
@@ -36,11 +37,13 @@ contract Lottery is VRFConsumerBaseV2 {
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function enterRaffle() public payable {
+    function enterRaffle(uint256 amount, uint256 num) public payable {
         if (msg.value < i_entranceFee) {
             revert RaffleError();
         } else {
             player = msg.sender;
+            playerNum = num;
+            gambelledamount = amount;
         }
     }
 
@@ -54,22 +57,17 @@ contract Lottery is VRFConsumerBaseV2 {
         );
     }
 
-    function requestNumFromUser(uint256 num) public returns (uint256) {
-        playerNum = num;
-        return playerNum;
-    }
-
     function fulfillRandomWords(
         uint256, /*requestId*/
         uint256[] memory randomWords
     ) internal override {
-        randomnum = randomWords[0] % 6;
+        randomnum = randomWords[0];
         winnerOrNot = (randomnum == playerNum);
         emit Random(0, randomnum, player);
     }
 
-    function giveEntranceFee() public view returns (uint256) {
-        return i_entranceFee;
+    function getAmountsentByUser() public view returns (uint256) {
+        return gambelledamount;
     }
 
     function getrandnum() public view returns (uint256) {
@@ -78,5 +76,9 @@ contract Lottery is VRFConsumerBaseV2 {
 
     function getwinnerOrNot() public view returns (bool) {
         return winnerOrNot;
+    }
+
+    function getUserNum() public view returns (uint256) {
+        return playerNum;
     }
 }
