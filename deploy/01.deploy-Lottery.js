@@ -18,6 +18,14 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinator"]
     }
 
+    // let args = [
+    //     vrfCoordinatorV2Address,
+    //     ethers.utils.parseEther("0.01"),
+    //     "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc",
+    //     "7165",
+    //     "500000",
+    // ]
+
     let args = [
         vrfCoordinatorV2Address,
         ethers.utils.parseEther("0.01"),
@@ -33,12 +41,17 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         waitConfirmations: network.config.blockConfirmations || 1,
     })
 
-    if (chainId !== 31337 && process.env.ETHERSCAN_API_KEY) {
-        console.log("verifying")
-        await verify(lottery.address, args)
-    }
+    // const lot = await ethers.getContract("Lottery")
+    // let tx = await lot.getrandnum()
+    // let { events } = await tx.wait()
+    // console.log(events)
+
+    // if (chainId !== 31337 && process.env.ETHERSCAN_API_KEY) {
+    //     console.log("verifying")
+    //     await verify(lottery.address, args)
+    // }
 
     log("------------------------------------------")
 }
 
-// module.exports.tags = ["rinkeby", "lottery"]
+module.exports.tags = ["all", "lottery"]

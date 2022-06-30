@@ -43,7 +43,11 @@ contract Lottery is VRFConsumerBaseV2 {
         } else {
             player = msg.sender;
             playerNum = num;
-            gambelledamount = amount;
+            if (msg.value == amount) {
+                gambelledamount = amount;
+            } else {
+                revert RaffleError();
+            }
         }
     }
 
@@ -61,13 +65,28 @@ contract Lottery is VRFConsumerBaseV2 {
         uint256, /*requestId*/
         uint256[] memory randomWords
     ) internal override {
-        randomnum = randomWords[0];
+        randomnum = randomWords[0] % 6;
         winnerOrNot = (randomnum == playerNum);
         emit Random(0, randomnum, player);
     }
 
+    function getEntranceFee() public view returns (uint256) {
+        return i_entranceFee;
+    }
+
     function getAmountsentByUser() public view returns (uint256) {
         return gambelledamount;
+    }
+
+    function randnumgen() public returns (uint256) {
+        uint256 requestId = i_vrfCoordinator.requestRandomWords(
+            i_gasLane,
+            i_subscriptionId,
+            requestConfirmations,
+            i_callbackGasLimit,
+            numWords
+        );
+        return randomnum;
     }
 
     function getrandnum() public view returns (uint256) {

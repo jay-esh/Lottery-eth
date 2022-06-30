@@ -20,6 +20,8 @@ module.exports = {
         localhost: {
             chainId: 31337,
             blockConfirmations: 1,
+            gas: 2100000,
+            gasPrice: 8000000000,
         },
         rinkeby: {
             url: RINKEBY_RPC_URL,
@@ -30,6 +32,8 @@ module.exports = {
             saveDeployments: true,
             chainId: 4,
             blockConfirmations: 6,
+            gas: 2100000,
+            gasPrice: 8000000000,
         },
     },
     namedAccounts: {
