@@ -3,4 +3,3 @@ artifacts
 cache
 deployments
 .env
-scripts
