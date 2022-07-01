@@ -7,31 +7,32 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
-    // const entranceFee = networkConfig[chainId]["entranceFee"]
-    let vrfCoordinatorV2Address
+    let vrfCoordinatorV2Address, subscriptionId
+    const subfunamount = ethers.utils.parseEther("30")
 
     if (chainId == 31337) {
         const vrfCoordinatorV2 = await ethers.getContract("VRFCoordinatorV2Mock")
-        // console.log(vrfCoordinatorV2)
+
         vrfCoordinatorV2Address = vrfCoordinatorV2.address
+        const transactionResponse = await vrfCoordinatorV2.createSubscription()
+
+        const transactionReciept = await transactionResponse.wait(1)
+
+        subscriptionId = transactionReciept.events[0].args.subId
+
+        // fund the subscription
+        await vrfCoordinatorV2.fundSubscription(subscriptionId, subfunamount)
     } else {
         vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinator"]
+        subscriptionId = "7165"
     }
-
-    // let args = [
-    //     vrfCoordinatorV2Address,
-    //     ethers.utils.parseEther("0.01"),
-    //     "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc",
-    //     "7165",
-    //     "500000",
-    // ]
 
     let args = [
         vrfCoordinatorV2Address,
-        ethers.utils.parseEther("0.01"),
-        "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc",
-        "7165",
-        "500000",
+        networkConfig[chainId]["entranceFee"],
+        networkConfig[chainId]["gasLane"],
+        subscriptionId,
+        networkConfig[chainId]["callbackGasLimit"],
     ]
 
     const lottery = await deploy("Lottery", {
@@ -40,11 +41,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         log: true,
         waitConfirmations: network.config.blockConfirmations || 1,
     })
-
-    // const lot = await ethers.getContract("Lottery")
-    // let tx = await lot.getrandnum()
-    // let { events } = await tx.wait()
-    // console.log(events)
 
     // if (chainId !== 31337 && process.env.ETHERSCAN_API_KEY) {
     //     console.log("verifying")

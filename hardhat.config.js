@@ -17,7 +17,7 @@ module.exports = {
     defaultNetwork: "hardhat",
     solidity: "0.8.7",
     networks: {
-        localhost: {
+        hardhat: {
             chainId: 31337,
             blockConfirmations: 1,
             gas: 2100000,

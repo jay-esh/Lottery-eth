@@ -8,7 +8,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 error RaffleError();
 
 contract Lottery is VRFConsumerBaseV2 {
-    event Random(uint256 indexed id, uint256 indexed randomnumber, address from);
+    event Random(uint256 indexed requestid, uint256 indexed randomnumber, address from);
 
     uint256 private immutable i_entranceFee;
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -16,7 +16,7 @@ contract Lottery is VRFConsumerBaseV2 {
     uint64 private immutable i_subscriptionId;
     uint16 private constant requestConfirmations = 3;
     uint32 private immutable i_callbackGasLimit;
-    uint32 private constant numWords = 1;
+    uint32 private constant numWords = 2;
     uint256 public randomnum;
     address public player;
     uint256 public playerNum;
@@ -59,15 +59,14 @@ contract Lottery is VRFConsumerBaseV2 {
             i_callbackGasLimit,
             numWords
         );
+        // emit Random(0, randomnum, player);
+        // randomnum = randomWords[0] % 6;
     }
 
-    function fulfillRandomWords(
-        uint256, /*requestId*/
-        uint256[] memory randomWords
-    ) internal override {
-        randomnum = randomWords[0] % 6;
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
+        randomnum = randomWords[1] % 6;
         winnerOrNot = (randomnum == playerNum);
-        emit Random(0, randomnum, player);
+        emit Random(requestId, randomnum, player);
     }
 
     function getEntranceFee() public view returns (uint256) {
@@ -86,6 +85,7 @@ contract Lottery is VRFConsumerBaseV2 {
             i_callbackGasLimit,
             numWords
         );
+        emit Random(requestId, randomnum, player);
         return randomnum;
     }
 
