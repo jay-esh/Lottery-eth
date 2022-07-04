@@ -53,9 +53,6 @@ contract Lottery is VRFConsumerBaseV2 {
             playerNum = num;
             if (msg.value == amount) {
                 gambelledamount = amount;
-                if (num == randomnum) {
-                    winnerOrNot = true;
-                }
             } else {
                 revert EthTransferError();
             }

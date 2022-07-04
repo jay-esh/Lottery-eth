@@ -14,7 +14,7 @@ describe("Lottery", () => {
         lotteryContract = await ethers.getContract("Lottery", deployer)
         lottery = await lotteryContract.connect(player)
         mock = await ethers.getContract("VRFCoordinatorV2Mock", deployer)
-        randomNum = (await lottery.getrandnum()).toString()
+        randomNum = await lottery.getrandnum()
         entranceFee = await lottery.getEntranceFee()
     })
 
@@ -28,12 +28,6 @@ describe("Lottery", () => {
             amount = ethers.utils.parseEther("0.01")
             await expect(lottery.enterRaffle(amount, 100000, { value: entranceFee })).to.be.reverted
             await expect(lottery.enterRaffle(amount, -6, { value: entranceFee })).to.be.reverted
-        })
-
-        it("checks if the `winnerornot` storage variable is changed to true or not", async () => {
-            amount = ethers.utils.parseEther("0.01")
-            await lottery.enterRaffle(amount, randomNum, { value: entranceFee })
-            await assert.equal(await lottery.getwinnerOrNot(), true)
         })
     })
 })
