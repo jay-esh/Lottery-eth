@@ -2,7 +2,7 @@ const { deployments, ethers, getNamedAccounts } = require("hardhat")
 const { assert, expect } = require("chai")
 
 describe("Lottery", () => {
-    let lottery, amount, lotteryContract, mock
+    let lottery, amount, lotteryContract, mock, randomNum, entranceFee
 
     beforeEach(async () => {
         const { deploy, log } = deployments
@@ -14,25 +14,26 @@ describe("Lottery", () => {
         lotteryContract = await ethers.getContract("Lottery", deployer)
         lottery = await lotteryContract.connect(player)
         mock = await ethers.getContract("VRFCoordinatorV2Mock", deployer)
+        randomNum = (await lottery.getrandnum()).toString()
+        entranceFee = await lottery.getEntranceFee()
     })
 
     describe("enterRaffle", () => {
         it("checks if the function fails when the amount is less than the entrance fee", async () => {
             amount = ethers.utils.parseEther("0.001")
-            // console.log("here")
-            await expect(lottery.enterRaffle(amount, 0))
+            await expect(lottery.enterRaffle(amount, 0, { value: entranceFee })).to.be.reverted
         })
 
         it("checks if the function reverts if the usernumber provided is not b/w 0 and 5 inclusive", async () => {
             amount = ethers.utils.parseEther("0.01")
-            await expect(lottery.enterRaffle(amount, 100000))
-            await expect(lottery.enterRaffle(amount, 6))
+            await expect(lottery.enterRaffle(amount, 100000, { value: entranceFee })).to.be.reverted
+            await expect(lottery.enterRaffle(amount, -6, { value: entranceFee })).to.be.reverted
         })
 
         it("checks if the `winnerornot` storage variable is changed to true or not", async () => {
             amount = ethers.utils.parseEther("0.01")
-            await lottery.enterRaffle(amount, 0)
-            await assert.equal(lottery.getwinnerOrNot(), true)
+            await lottery.enterRaffle(amount, randomNum, { value: entranceFee })
+            await assert.equal(await lottery.getwinnerOrNot(), true)
         })
     })
 })
