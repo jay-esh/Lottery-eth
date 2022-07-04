@@ -46,7 +46,7 @@ contract Lottery is VRFConsumerBaseV2 {
     }
 
     function enterRaffle(uint256 amount, uint256 num) public payable {
-        if (msg.value < i_entranceFee) {
+        if (msg.value < i_entranceFee || num > 5 || num < 0) {
             revert RaffleError();
         } else {
             player = payable(msg.sender);
@@ -57,7 +57,7 @@ contract Lottery is VRFConsumerBaseV2 {
                     winnerOrNot = true;
                 }
             } else {
-                revert RaffleError();
+                revert EthTransferError();
             }
         }
     }
